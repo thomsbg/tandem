@@ -20,7 +20,7 @@ TandemFile    = require('./file')
 _check = (force = false, done = ->) ->
   async.each(_.values(@_files), (file, callback) =>
     return unless file?
-    if force or file.lastUpdated + @settings['inactive timeout'] < Date.now()
+    if @settings['store every check'] or force or file.lastUpdated + @settings['inactive timeout'] < Date.now()
       async.waterfall([
         _save.bind(this, file),
         _close.bind(this, file)

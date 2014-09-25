@@ -21,7 +21,7 @@
         if (file == null) {
           return;
         }
-        if (force || file.lastUpdated + _this.settings['inactive timeout'] < Date.now()) {
+        if (_this.settings['store every check'] || force || file.lastUpdated + _this.settings['inactive timeout'] < Date.now()) {
           return async.waterfall([_save.bind(_this, file), _close.bind(_this, file)], function(err) {
             return callback(null);
           });
