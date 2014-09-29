@@ -4,9 +4,11 @@
   "dependencies": {
     "async"         : "0.2.x",
     "commander"     : "2.1.x",
-    "socket.io"     : "1.1.x",
     "tandem-core"   : "0.6.x",
     "lodash"        : "2.4.x"
+  },
+  "peerDependencies": {
+    "socket.io": "1.1.x"
   },
   "devDependencies": {
     "chai"                 : "1.9.x",
