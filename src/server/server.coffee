@@ -30,12 +30,12 @@ class TandemServer extends EventEmitter
     network : TandemSocket
     storage : TandemStorage
 
-  constructor: (server, options = {}) ->
+  constructor: (options = {}) ->
     @settings = _.defaults(options, TandemServer.DEFAULTS)
     @storage = if _.isFunction(@settings.storage) then new @settings.storage else @settings.storage
     @fileManager = new TandemFileManager(@storage, @settings)
     @settings.network = TandemNetworkAdapter if @settings.network == 'base'
-    @network = if _.isFunction(@settings.network) then new @settings.network(server, @fileManager, @storage, @settings) else @settings.network
+    @network = if _.isFunction(@settings.network) then new @settings.network(@fileManager, @storage, options) else @settings.network
     TandemEmitter.on(TandemEmitter.events.ERROR, (args...) =>
       this.emit(TandemServer.events.ERROR, args...)
     )

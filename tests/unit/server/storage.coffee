@@ -15,6 +15,7 @@ _       = require('lodash')
 async   = require('async')
 expect  = require('chai').expect
 http    = require('http')
+socketio = require('socket.io')
 EventEmitter = require('events').EventEmitter
 TandemClient = require('../../client')
 TandemServer = require('../../../index')
@@ -27,7 +28,9 @@ describe('Server Storage', ->
   before( ->
     httpServer = http.createServer()
     httpServer.listen(9090)
-    server = new TandemServer.Server(httpServer, {
+    io = socketio(httpServer)
+    server = new TandemServer.Server({
+      io: io,
       storage:
         authorize: (authPacket, callback) ->
           callback(if authPacket.auth.secret == 1337 then null else "Access Denied")

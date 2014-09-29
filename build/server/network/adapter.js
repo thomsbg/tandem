@@ -27,7 +27,7 @@
       UPDATE: 'ot/update'
     };
 
-    function TandemNetworkAdapter(httpServer, fileManager) {
+    function TandemNetworkAdapter(fileManager) {
       this.fileManager = fileManager;
     }
 

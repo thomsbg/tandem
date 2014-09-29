@@ -15,6 +15,7 @@ _       = require('lodash')
 async   = require('async')
 expect  = require('chai').expect
 http    = require('http')
+socketio = require('socket.io')
 TandemClient = require('../client')
 TandemServer = require('../../index')
 
@@ -46,7 +47,8 @@ describe('Messaging', ->
   before( ->
     httpServer = http.createServer()
     httpServer.listen(9090)
-    server = new TandemServer.Server(httpServer, { storage: Storage })
+    io = socketio(httpServer)
+    server = new TandemServer.Server({ io: io, storage: Storage })
     client1 = new TandemClient.Client('http://localhost:9090')
     client2 = new TandemClient.Client('http://localhost:9090')
   )

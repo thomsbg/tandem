@@ -14,20 +14,22 @@
 _       = require('lodash')
 expect  = require('chai').expect
 http    = require('http')
+socketio = require('socket.io')
 TandemClient = require('../client')
 TandemServer = require('../../index')
 
 describe('Connection', ->
   httpServer = server = client = null
-  
-  before( ->
+
+  beforeEach( ->
     httpServer = http.createServer()
     httpServer.listen(9090)
-    server = new TandemServer.Server(httpServer)
+    io = socketio(httpServer)
+    server = new TandemServer.Server({ io: io })
     client = new TandemClient.Client('http://localhost:9090')
   )
 
-  after( ->
+  afterEach( ->
     httpServer.close()
   )
 
@@ -45,9 +47,9 @@ describe('Connection', ->
     file.on(TandemClient.File.events.READY, ->
       expect(file.health).to.equal(TandemClient.File.health.HEALTHY)
       client.adapter.socket.disconnect()
-      expect(server.network.io.sockets.clients('disconnect-test').length).to.equal(1)
+      expect(Object.keys(server.network.files).length).to.equal(1)
       setTimeout( =>
-        expect(server.network.io.sockets.clients('disconnect-test').length).to.equal(0)
+        expect(Object.keys(server.network.files).length).to.equal(0)
         done()
       , 100)
     )

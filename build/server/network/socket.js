@@ -1,13 +1,11 @@
 (function() {
-  var TandemAdapter, TandemEmitter, TandemSocket, async, socketio, _, _authenticate,
+  var TandemAdapter, TandemEmitter, TandemSocket, async, _, _authenticate,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   _ = require('lodash');
 
   async = require('async');
-
-  socketio = require('socket.io');
 
   TandemAdapter = require('./adapter');
 
@@ -33,30 +31,13 @@
   TandemSocket = (function(_super) {
     __extends(TandemSocket, _super);
 
-    TandemSocket.DEFAULTS = {
-      'browser client': false,
-      'log level': 1,
-      'transports': ['websocket', 'xhr-polling']
-    };
-
-    function TandemSocket(httpServer, fileManager, storage, options) {
+    function TandemSocket(fileManager, storage, options) {
       this.fileManager = fileManager;
       this.storage = storage;
-      if (options == null) {
-        options = {};
-      }
-      TandemSocket.__super__.constructor.apply(this, arguments);
       this.files = {};
-      this.settings = _.defaults(_.pick(options, _.keys(TandemSocket.DEFAULTS)), TandemSocket.DEFAULTS);
       this.sockets = {};
-      this.io = socketio.listen(httpServer, this.settings);
-      this.io.configure('production', (function(_this) {
-        return function() {
-          _this.io.enable('browser client minification');
-          return _this.io.enable('browser client etag');
-        };
-      })(this));
-      this.io.sockets.on('connection', (function(_this) {
+      this.io = options.io;
+      this.io.on('connection', (function(_this) {
         return function(socket) {
           _this.sockets[socket.id] = socket;
           return socket.on('auth', function(packet, callback) {
@@ -79,9 +60,11 @@
               if (err != null) {
                 TandemEmitter.emit(TandemEmitter.events.ERROR, err);
               }
-              callback(callbackPacket);
+              if (callback != null) {
+                callback(callbackPacket);
+              }
               if (broadcastPacket != null) {
-                return socket.broadcast.to(fileId).emit(route, broadcastPacket);
+                return socket.to(fileId).emit(route, broadcastPacket);
               }
             });
           });

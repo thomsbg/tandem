@@ -35,7 +35,7 @@
       storage: TandemStorage
     };
 
-    function TandemServer(server, options) {
+    function TandemServer(options) {
       if (options == null) {
         options = {};
       }
@@ -45,7 +45,7 @@
       if (this.settings.network === 'base') {
         this.settings.network = TandemNetworkAdapter;
       }
-      this.network = _.isFunction(this.settings.network) ? new this.settings.network(server, this.fileManager, this.storage, this.settings) : this.settings.network;
+      this.network = _.isFunction(this.settings.network) ? new this.settings.network(this.fileManager, this.storage, options) : this.settings.network;
       TandemEmitter.on(TandemEmitter.events.ERROR, (function(_this) {
         return function() {
           var args;

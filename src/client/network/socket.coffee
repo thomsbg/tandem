@@ -12,7 +12,7 @@
 # software without specific prior written permission.
 
 _ = require('lodash')
-io = require('socket.io-client')
+socketio = require('socket.io-client')
 TandemAdapter = require('./adapter')
 
 
@@ -60,14 +60,6 @@ class TandemSocketAdapter extends TandemAdapter
     'reconnection limit'        : 30000
     'sync disconnect on unload' : false
 
-  @parseUrl: (url) ->
-    a = document.createElement('a')
-    a.href = url
-    protocol = if a.protocol == 'http:' or a.protocol == 'https:' then a.protocol else 'http:'
-    ret = { hostname: a.hostname, protocol: protocol }
-    ret['port'] = a.port if a.port
-    return ret
-
   constructor: (endpointUrl, @fileId, @userId, @authObj, options = {}) ->
     super
     options = _.pick(options, _.keys(TandemSocketAdapter.DEFAULTS).concat(_.keys(TandemSocketAdapter.IO_DEFAULTS)))
@@ -79,13 +71,7 @@ class TandemSocketAdapter extends TandemAdapter
       recieve  : {}
       callback : {}
     socketOptions = _.clone(@settings)
-    url = TandemSocketAdapter.parseUrl(endpointUrl)
-    if url.protocol == 'https:'
-      socketOptions['secure'] = true
-      socketOptions['port'] = 443
-    socketOptions['port'] = url.port if url.port
-    socketOptions['query'] = "fileId=#{@fileId}"
-    @socket = io.connect("#{url.protocol}//#{url.hostname}", socketOptions)
+    @socket = socketio(endpointUrl, socketOptions)
     @socket.on('reconnecting', =>
       this.emit(TandemAdapter.events.RECONNECTING)
       @ready = false
@@ -107,9 +93,9 @@ class TandemSocketAdapter extends TandemAdapter
       info.call(this, "Got", route, packet)
       track.call(this, TandemSocketAdapter.RECIEVE, route, packet)
       callback.call(this, packet) if callback?
-    @socket.removeListener(route, onSocketCallback) if @socketListeners[route]?
+    @socket.off(route, onSocketCallback) if @socketListeners[route]?
     @socketListeners[route] = onSocketCallback
-    @socket.addListener(route, onSocketCallback)
+    @socket.on(route, onSocketCallback)
     return this
 
   send: (route, packet, callback) ->

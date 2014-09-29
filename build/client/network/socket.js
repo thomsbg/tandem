@@ -1,12 +1,12 @@
 (function() {
-  var TandemAdapter, TandemSocketAdapter, authenticate, info, io, track, _,
+  var TandemAdapter, TandemSocketAdapter, authenticate, info, socketio, track, _,
     __slice = [].slice,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   _ = require('lodash');
 
-  io = require('socket.io-client');
+  socketio = require('socket.io-client');
 
   TandemAdapter = require('./adapter');
 
@@ -80,23 +80,8 @@
       'sync disconnect on unload': false
     };
 
-    TandemSocketAdapter.parseUrl = function(url) {
-      var a, protocol, ret;
-      a = document.createElement('a');
-      a.href = url;
-      protocol = a.protocol === 'http:' || a.protocol === 'https:' ? a.protocol : 'http:';
-      ret = {
-        hostname: a.hostname,
-        protocol: protocol
-      };
-      if (a.port) {
-        ret['port'] = a.port;
-      }
-      return ret;
-    };
-
     function TandemSocketAdapter(endpointUrl, fileId, userId, authObj, options) {
-      var socketOptions, url;
+      var socketOptions;
       this.fileId = fileId;
       this.userId = userId;
       this.authObj = authObj;
@@ -114,16 +99,7 @@
         callback: {}
       };
       socketOptions = _.clone(this.settings);
-      url = TandemSocketAdapter.parseUrl(endpointUrl);
-      if (url.protocol === 'https:') {
-        socketOptions['secure'] = true;
-        socketOptions['port'] = 443;
-      }
-      if (url.port) {
-        socketOptions['port'] = url.port;
-      }
-      socketOptions['query'] = "fileId=" + this.fileId;
-      this.socket = io.connect("" + url.protocol + "//" + url.hostname, socketOptions);
+      this.socket = socketio(endpointUrl, socketOptions);
       this.socket.on('reconnecting', (function(_this) {
         return function() {
           _this.emit(TandemAdapter.events.RECONNECTING);
@@ -162,10 +138,10 @@
         };
       })(this);
       if (this.socketListeners[route] != null) {
-        this.socket.removeListener(route, onSocketCallback);
+        this.socket.off(route, onSocketCallback);
       }
       this.socketListeners[route] = onSocketCallback;
-      this.socket.addListener(route, onSocketCallback);
+      this.socket.on(route, onSocketCallback);
       return this;
     };
 

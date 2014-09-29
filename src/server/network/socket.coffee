@@ -13,7 +13,6 @@
 
 _             = require('lodash')
 async         = require('async')
-socketio      = require('socket.io')
 TandemAdapter = require('./adapter')
 TandemEmitter = require('../emitter')
 
@@ -29,22 +28,11 @@ _authenticate = (socket, packet, callback) ->
 
 
 class TandemSocket extends TandemAdapter
-  @DEFAULTS:
-    'browser client': false
-    'log level': 1
-    'transports': ['websocket', 'xhr-polling']
-
-  constructor: (httpServer, @fileManager, @storage, options = {}) ->
-    super
+  constructor: (@fileManager, @storage, options) ->
     @files = {}
-    @settings = _.defaults(_.pick(options, _.keys(TandemSocket.DEFAULTS)), TandemSocket.DEFAULTS)
     @sockets = {}
-    @io = socketio.listen(httpServer, @settings)
-    @io.configure('production', =>
-      @io.enable('browser client minification')
-      @io.enable('browser client etag')
-    )
-    @io.sockets.on('connection', (socket) =>
+    @io = options.io
+    @io.on('connection', (socket) =>
       @sockets[socket.id] = socket
       socket.on('auth', (packet, callback) =>
         _authenticate.call(this, socket, packet, callback)
@@ -60,8 +48,8 @@ class TandemSocket extends TandemAdapter
       socket.on(route, (packet, callback) =>
         this.handle(route, @files[sessionId], packet, (err, callbackPacket, broadcastPacket) =>
           TandemEmitter.emit(TandemEmitter.events.ERROR, err) if err?
-          callback(callbackPacket)
-          socket.broadcast.to(fileId).emit(route, broadcastPacket) if broadcastPacket?
+          callback(callbackPacket) if callback?
+          socket.to(fileId).emit(route, broadcastPacket) if broadcastPacket?
         )
       )
     )
