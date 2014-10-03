@@ -53,18 +53,10 @@ class TandemSocketAdapter extends TandemAdapter
     debug: false
     latency: 0
 
-  @IO_DEFAULTS:
-    'force new connection'      : true
-    'max reconnection attempts' : Infinity
-    'port'                      : 80
-    'reconnection limit'        : 30000
-    'sync disconnect on unload' : false
-
   constructor: (endpointUrl, @fileId, @userId, @authObj, options = {}) ->
     super
     options = _.pick(options, _.keys(TandemSocketAdapter.DEFAULTS).concat(_.keys(TandemSocketAdapter.IO_DEFAULTS)))
-    @settings = _.extend({}, TandemSocketAdapter.DEFAULTS, TandemSocketAdapter.IO_DEFAULTS, options)
-    @id = _.uniqueId('adapter-')
+    @settings = _.extend({}, TandemSocketAdapter.DEFAULTS, options)
     @socketListeners = {}
     @stats =
       send     : {}

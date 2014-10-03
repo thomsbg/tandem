@@ -49,7 +49,7 @@ module.exports = (grunt) ->
             'bower_components/async/lib/async.js:async'
             'bower_components/eventemitter2/lib/eventemitter2.js:eventemitter2'
             'bower_components/lodash/dist/lodash.js:lodash'
-            'bower_components/socket.io-client/dist/socket.io.js:socket.io-client'
+            'bower_components/socket.io-client/socket.io.js:socket.io-client'
           ]
           standalone: 'Tandem'
         files: [{ dest: 'build/tandem.all.js', src: ['browser.js'] }]

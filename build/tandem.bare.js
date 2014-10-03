@@ -1,4 +1,4 @@
-/*! Tandem Realtime Coauthoring Engine - v0.13.4 - 2014-09-25
+/*! Tandem Realtime Coauthoring Engine - v0.13.4 - 2014-10-03
  *  Copyright (c) 2014
  *  Jason Chen, Salesforce.com
  *  Byron Milligan, Salesforce.com

@@ -72,14 +72,6 @@
       latency: 0
     };
 
-    TandemSocketAdapter.IO_DEFAULTS = {
-      'force new connection': true,
-      'max reconnection attempts': Infinity,
-      'port': 80,
-      'reconnection limit': 30000,
-      'sync disconnect on unload': false
-    };
-
     function TandemSocketAdapter(endpointUrl, fileId, userId, authObj, options) {
       var socketOptions;
       this.fileId = fileId;
@@ -90,8 +82,7 @@
       }
       TandemSocketAdapter.__super__.constructor.apply(this, arguments);
       options = _.pick(options, _.keys(TandemSocketAdapter.DEFAULTS).concat(_.keys(TandemSocketAdapter.IO_DEFAULTS)));
-      this.settings = _.extend({}, TandemSocketAdapter.DEFAULTS, TandemSocketAdapter.IO_DEFAULTS, options);
-      this.id = _.uniqueId('adapter-');
+      this.settings = _.extend({}, TandemSocketAdapter.DEFAULTS, options);
       this.socketListeners = {};
       this.stats = {
         send: {},
