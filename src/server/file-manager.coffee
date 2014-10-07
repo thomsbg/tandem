@@ -41,7 +41,7 @@ _close = (file, callback) ->
   )
 
 _save = (file, callback) ->
-  return callback(null) if !file.isDirty()
+  return callback(null, file.version) if !file.isDirty()
   version = file.version
   head = file.head
   if @storage?
@@ -49,12 +49,12 @@ _save = (file, callback) ->
       return callback(err) if err?
       @storage.update(file.id, head, version, deltas, (err) ->
         file.versionSaved = version unless err?
-        callback(err)
+        callback(err, version)
       )
     )
   else
     file.versionSaved = version unless err?
-    callback(null)
+    callback(null, version)
 
 
 class TandemFileManager

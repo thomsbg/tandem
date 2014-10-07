@@ -213,7 +213,7 @@ class TandemFile extends EventEmitter2
 
   save: (callback) ->
     this.send(TandemFile.routes.SAVE, {}, (response) =>
-      callback() if callback?
+      callback(response) if callback?
     )
 
   send: (route, packet, callback = null, priority = false) ->

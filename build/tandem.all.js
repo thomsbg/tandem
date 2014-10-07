@@ -14852,7 +14852,7 @@ module.exports = Tandem
       return this.send(TandemFile.routes.SAVE, {}, (function(_this) {
         return function(response) {
           if (callback != null) {
-            return callback();
+            return callback(response);
           }
         };
       })(this));

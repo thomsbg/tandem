@@ -72,7 +72,13 @@ class TandemNetworkAdapter
               })
           )
         when TandemNetworkAdapter.routes.SAVE
-          @fileManager.save(file, callback)
+          @fileManager.save(file, (err, version) =>
+            return callback(err, { error: err }) if err?
+            callback(null, {
+              fileId: fileId,
+              version: version
+            })
+          )
         else
           callback(new Error('Unexpected network route'))
     )

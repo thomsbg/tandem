@@ -51,7 +51,7 @@
   _save = function(file, callback) {
     var head, version;
     if (!file.isDirty()) {
-      return callback(null);
+      return callback(null, file.version);
     }
     version = file.version;
     head = file.head;
@@ -65,7 +65,7 @@
             if (err == null) {
               file.versionSaved = version;
             }
-            return callback(err);
+            return callback(err, version);
           });
         };
       })(this));
@@ -73,7 +73,7 @@
       if (typeof err === "undefined" || err === null) {
         file.versionSaved = version;
       }
-      return callback(null);
+      return callback(null, version);
     }
   };
 

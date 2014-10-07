@@ -79,7 +79,17 @@
                 }
               });
             case TandemNetworkAdapter.routes.SAVE:
-              return _this.fileManager.save(file, callback);
+              return _this.fileManager.save(file, function(err, version) {
+                if (err != null) {
+                  return callback(err, {
+                    error: err
+                  });
+                }
+                return callback(null, {
+                  fileId: fileId,
+                  version: version
+                });
+              });
             default:
               return callback(new Error('Unexpected network route'));
           }
