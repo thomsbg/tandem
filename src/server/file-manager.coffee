@@ -33,7 +33,7 @@ _check = (force = false, done = ->) ->
     done(err)
   )
 
-_close = (file, callback) ->
+_close = (file, version, callback) ->
   file.close((err) =>
     return TandemEmitter.emit(TandemEmitter.events.ERROR, err) if err?
     delete @_files[file.id]

@@ -36,7 +36,7 @@
     })(this));
   };
 
-  _close = function(file, callback) {
+  _close = function(file, version, callback) {
     return file.close((function(_this) {
       return function(err) {
         if (err != null) {
