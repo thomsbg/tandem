@@ -81,6 +81,8 @@ class TandemFileManager
 
   stop: (callback) ->
     _check.call(this, true, callback)
-      
+
+  save: (file, callback) ->
+    _save.call(this, file, callback)
 
 module.exports = TandemFileManager

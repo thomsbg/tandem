@@ -1,4 +1,4 @@
-/*! Tandem Realtime Coauthoring Engine - v0.13.4 - 2014-10-03
+/*! Tandem Realtime Coauthoring Engine - v0.13.4 - 2014-10-07
  *  Copyright (c) 2014
  *  Jason Chen, Salesforce.com
  *  Byron Milligan, Salesforce.com
@@ -14766,7 +14766,8 @@ module.exports = Tandem
       BROADCAST: 'broadcast',
       RESYNC: 'ot/resync',
       SYNC: 'ot/sync',
-      UPDATE: 'ot/update'
+      UPDATE: 'ot/update',
+      SAVE: 'save'
     };
 
     function TandemFile(fileId, adapter, initial, callback) {
@@ -14845,6 +14846,16 @@ module.exports = Tandem
         warn("Local update error, attempting resync", this.id, this.inLine, this.delta);
         return sendResync.call(this);
       }
+    };
+
+    TandemFile.prototype.save = function(callback) {
+      return this.send(TandemFile.routes.SAVE, {}, (function(_this) {
+        return function(response) {
+          if (callback != null) {
+            return callback();
+          }
+        };
+      })(this));
     };
 
     TandemFile.prototype.send = function(route, packet, callback, priority) {

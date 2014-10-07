@@ -209,7 +209,8 @@
       BROADCAST: 'broadcast',
       RESYNC: 'ot/resync',
       SYNC: 'ot/sync',
-      UPDATE: 'ot/update'
+      UPDATE: 'ot/update',
+      SAVE: 'save'
     };
 
     function TandemFile(fileId, adapter, initial, callback) {
@@ -288,6 +289,16 @@
         warn("Local update error, attempting resync", this.id, this.inLine, this.delta);
         return sendResync.call(this);
       }
+    };
+
+    TandemFile.prototype.save = function(callback) {
+      return this.send(TandemFile.routes.SAVE, {}, (function(_this) {
+        return function(response) {
+          if (callback != null) {
+            return callback();
+          }
+        };
+      })(this));
     };
 
     TandemFile.prototype.send = function(route, packet, callback, priority) {

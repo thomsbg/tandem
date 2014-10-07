@@ -119,6 +119,10 @@
       return _check.call(this, true, callback);
     };
 
+    TandemFileManager.prototype.save = function(file, callback) {
+      return _save.call(this, file, callback);
+    };
+
     return TandemFileManager;
 
   })();

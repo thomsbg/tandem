@@ -24,7 +24,8 @@
     TandemNetworkAdapter.routes = {
       RESYNC: 'ot/resync',
       SYNC: 'ot/sync',
-      UPDATE: 'ot/update'
+      UPDATE: 'ot/update',
+      SAVE: 'save'
     };
 
     function TandemNetworkAdapter(fileManager) {
@@ -77,6 +78,8 @@
                   });
                 }
               });
+            case TandemNetworkAdapter.routes.SAVE:
+              return _this.fileManager.save(file, callback);
             default:
               return callback(new Error('Unexpected network route'));
           }

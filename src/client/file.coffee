@@ -149,6 +149,7 @@ class TandemFile extends EventEmitter2
     RESYNC    : 'ot/resync'
     SYNC      : 'ot/sync'
     UPDATE    : 'ot/update'
+    SAVE      : 'save'
 
   constructor: (@fileId, @adapter, initial, callback) ->
     if !callback? and _.isFunction(initial)
@@ -209,6 +210,11 @@ class TandemFile extends EventEmitter2
       this.emit(TandemFile.events.ERROR, 'Cannot compose inLine with local delta', @inLine, delta)
       warn("Local update error, attempting resync", @id, @inLine, @delta)
       sendResync.call(this)
+
+  save: (callback) ->
+    this.send(TandemFile.routes.SAVE, {}, (response) =>
+      callback() if callback?
+    )
 
   send: (route, packet, callback = null, priority = false) ->
     @adapter.queue(route, packet, (response) =>

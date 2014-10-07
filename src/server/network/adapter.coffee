@@ -35,6 +35,7 @@ class TandemNetworkAdapter
     RESYNC    : 'ot/resync'
     SYNC      : 'ot/sync'
     UPDATE    : 'ot/update'
+    SAVE      : 'save'
 
   constructor: (@fileManager) ->
 
@@ -70,6 +71,8 @@ class TandemNetworkAdapter
                 version : version
               })
           )
+        when TandemNetworkAdapter.routes.SAVE
+          @fileManager.save(file, callback)
         else
           callback(new Error('Unexpected network route'))
     )
