@@ -49,7 +49,6 @@ class TandemNetworkAdapter
         when TandemNetworkAdapter.routes.RESYNC
           resyncHandler(null, file, callback)
         when TandemNetworkAdapter.routes.SYNC
-          return resyncHandler(err, file, callback) if err?
           file.sync(parseInt(packet.version), (err, delta, version) =>
             callback(err, {
               delta: delta
@@ -57,7 +56,6 @@ class TandemNetworkAdapter
             })
           )
         when TandemNetworkAdapter.routes.UPDATE
-          return resyncHandler(err, file, callback) if err?
           file.update(Tandem.Delta.makeDelta(packet.delta), parseInt(packet.version), (err, delta, version) =>
             if err?
               resyncHandler(err, file, callback)
