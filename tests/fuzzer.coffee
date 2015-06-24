@@ -11,11 +11,11 @@
 # its contributors may be used to endorse or promote products derived from this
 # software without specific prior written permission.
 
-_       = require('lodash')
-async   = require('async')
-expect  = require('chai').expect
-http    = require('http')
-Tandem       = require('tandem-core')
+_            = require('lodash')
+async        = require('async')
+expect       = require('chai').expect
+http         = require('http')
+Delta        = require('rich-text').Delta
 TandemClient = require('./client')
 TandemServer = require('../index')
 
@@ -103,7 +103,7 @@ describe('Connection', ->
   it('writer to reader', (done) ->
     this.timeout(20000)
     fuzz(1, 1, 1, 100, done)
-  ) 
+  )
 
   it('two writers to reader', (done) ->
     this.timeout(40000)

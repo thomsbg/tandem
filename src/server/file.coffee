@@ -14,8 +14,7 @@
 _             = require('lodash')
 async         = require('async')
 EventEmitter  = require('events').EventEmitter
-Tandem        = require('tandem-core')
-
+Delta         = require('rich-text').Delta
 
 _atomic = (fn) ->
   async.until( =>
@@ -42,7 +41,7 @@ _getLoadedVersion = (callback) ->
 _getDeltaSince = (version, callback) ->
   return callback(new FileError("Negative version", this)) if version < 0
   return callback(null, @head, @version) if version == 0
-  return callback(null, Tandem.Delta.getIdentity(@head.endLength), @version) if version == @version
+  return callback(null, new Delta().retain(@head.length()), @version) if version == @version
   this.getHistory(version, (err, deltas) =>
     return callback(err) if err?
     return callback(new FileError("No version #{version} in history", this)) if deltas.length == 0
@@ -99,7 +98,7 @@ class TandemFile extends EventEmitter
     @cache.range('history', version - @versionLoaded, (err, range) =>
       return callback(err) if err?
       deltas = _.map(range, (changeset) ->
-        return Tandem.Delta.makeDelta(JSON.parse(changeset).delta)
+        return new Delta(JSON.parse(changeset).delta)
       )
       return callback(null, deltas)
     )

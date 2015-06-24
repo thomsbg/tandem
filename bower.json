@@ -7,8 +7,8 @@
     "async"             : "0.2.x",
     "eventemitter2"     : "0.4.x",
     "lodash"            : "2.4.x",
-    "socket.io-client"  : "1.1.x",
-    "tandem-core"       : "tandem/tandem-core"
+    "rich-text"         : "ottypes/rich-text",
+    "socket.io-client"  : "1.1.x"
   },
   "ignore": [
     "**/.*",

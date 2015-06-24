@@ -12,7 +12,7 @@
 # software without specific prior written permission.
 
 EventEmitter  = require('events').EventEmitter
-Tandem        = require('tandem-core')
+Delta         = require('rich-text').Delta
 
 
 _makeResyncPacket = (file) ->
@@ -56,7 +56,7 @@ class TandemNetworkAdapter
             })
           )
         when TandemNetworkAdapter.routes.UPDATE
-          file.update(Tandem.Delta.makeDelta(packet.delta), parseInt(packet.version), (err, delta, version) =>
+          file.update(new Delta(packet.delta), parseInt(packet.version), (err, delta, version) =>
             if err?
               resyncHandler(err, file, callback)
             else

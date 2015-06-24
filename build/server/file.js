@@ -1,5 +1,5 @@
 (function() {
-  var EventEmitter, FileError, Tandem, TandemFile, async, _, _atomic, _getDeltaSince, _getLoadedVersion,
+  var Delta, EventEmitter, FileError, TandemFile, async, _, _atomic, _getDeltaSince, _getLoadedVersion,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -9,7 +9,7 @@
 
   EventEmitter = require('events').EventEmitter;
 
-  Tandem = require('tandem-core');
+  Delta = require('rich-text').Delta;
 
   _atomic = function(fn) {
     return async.until((function(_this) {
@@ -53,7 +53,7 @@
       return callback(null, this.head, this.version);
     }
     if (version === this.version) {
-      return callback(null, Tandem.Delta.getIdentity(this.head.endLength), this.version);
+      return callback(null, new Delta().retain(this.head.length()), this.version);
     }
     return this.getHistory(version, (function(_this) {
       return function(err, deltas) {
@@ -148,7 +148,7 @@
             return callback(err);
           }
           deltas = _.map(range, function(changeset) {
-            return Tandem.Delta.makeDelta(JSON.parse(changeset).delta);
+            return new Delta(JSON.parse(changeset).delta);
           });
           return callback(null, deltas);
         };

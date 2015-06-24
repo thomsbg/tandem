@@ -13,7 +13,7 @@
 
 _ = require('lodash')
 EventEmitter2 = require('eventemitter2')
-Delta = require('tandem-core/delta')
+Delta = require('rich-text').Delta;
 
 # Client may include a different EventEmitter2
 if EventEmitter2.EventEmitter2?
@@ -48,7 +48,7 @@ initListeners = ->
   initHealthListeners.call(this)
 
 onResync = (response) ->
-  delta = Delta.makeDelta(response.head)
+  delta = new Delta(response.head)
   decomposed = delta.decompose(@arrived)
   this.remoteUpdate(decomposed, response.version)
   this.emit(TandemFile.events.HEALTH, TandemFile.health.HEALTHY, @health)
@@ -56,7 +56,7 @@ onResync = (response) ->
 onUpdate = (response) ->
   @version = response.version
   @arrived = @arrived.compose(@inFlight)
-  @inFlight = Delta.getIdentity(@arrived.endLength)
+  @inFlight = new Delta(@arrived.length())
   sendUpdateIfReady.call(this)
 
 sendResync = (callback) ->
@@ -109,7 +109,7 @@ sendUpdate = ->
     else
       @version = response.version
       @arrived = @arrived.compose(@inFlight)
-      @inFlight = Delta.getIdentity(@arrived.endLength)
+      @inFlight = new Delta(@arrived.length())
       _.each(@updateCallbacks.inFlight, (callback) =>
         callback.call(this, null, @arrived)
       )
@@ -160,9 +160,9 @@ class TandemFile extends EventEmitter2
     @health = TandemFile.health.WARNING
     @ready = false
     @version = initial.version or 0
-    @arrived = initial.head or Delta.getInitial('')
-    @inFlight = Delta.getIdentity(@arrived.endLength)
-    @inLine = Delta.getIdentity(@arrived.endLength)
+    @arrived = initial.head or new Delta()
+    @inFlight = new Delta().retain(@arrived.length())
+    @inLine = new Delta().retain(@arrived.length())
     @updateCallbacks =
       inFlight: []
       inLine: []
@@ -190,13 +190,13 @@ class TandemFile extends EventEmitter2
     return !@inFlight.isIdentity() or !@inLine.isIdentity()
 
   remoteUpdate: (delta, @version) ->
-    delta = Delta.makeDelta(delta)
+    delta = new Delta(delta)
     if @arrived.canCompose(delta)
       @arrived = @arrived.compose(delta)
-      flightDeltaTranform = delta.transform(@inFlight, false)
-      textTransform = flightDeltaTranform.transform(@inLine, false)
-      @inFlight = @inFlight.transform(delta, true)
-      @inLine = @inLine.transform(flightDeltaTranform, true)
+      @inFlight = delta.transform(@inFlight, true)
+      flightDeltaTranform = @inFlight.transform(delta, false)
+      textTransform = @inLine.transform(flightDeltaTranform, false)
+      @inLine = flightDeltaTranform.transform(@inLine, true)
       this.emit(TandemFile.events.UPDATE, textTransform)
       return true
     else
@@ -232,8 +232,6 @@ class TandemFile extends EventEmitter2
       sendUpdate.call(this)
       return true
     return false
-
-  transform: (indexes) ->
 
 
 module.exports = TandemFile

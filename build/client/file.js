@@ -8,7 +8,7 @@
 
   EventEmitter2 = require('eventemitter2');
 
-  Delta = require('tandem-core/delta');
+  Delta = require('rich-text').Delta;
 
   if (EventEmitter2.EventEmitter2 != null) {
     EventEmitter2 = EventEmitter2.EventEmitter2;
@@ -68,7 +68,7 @@
 
   onResync = function(response) {
     var decomposed, delta;
-    delta = Delta.makeDelta(response.head);
+    delta = new Delta(response.head);
     decomposed = delta.decompose(this.arrived);
     this.remoteUpdate(decomposed, response.version);
     return this.emit(TandemFile.events.HEALTH, TandemFile.health.HEALTHY, this.health);
@@ -77,7 +77,7 @@
   onUpdate = function(response) {
     this.version = response.version;
     this.arrived = this.arrived.compose(this.inFlight);
-    this.inFlight = Delta.getIdentity(this.arrived.endLength);
+    this.inFlight = new Delta(this.arrived.length());
     return sendUpdateIfReady.call(this);
   };
 
@@ -154,7 +154,7 @@
         } else {
           _this.version = response.version;
           _this.arrived = _this.arrived.compose(_this.inFlight);
-          _this.inFlight = Delta.getIdentity(_this.arrived.endLength);
+          _this.inFlight = new Delta(_this.arrived.length());
           _.each(_this.updateCallbacks.inFlight, function(callback) {
             return callback.call(_this, null, _this.arrived);
           });
@@ -227,9 +227,9 @@
       this.health = TandemFile.health.WARNING;
       this.ready = false;
       this.version = initial.version || 0;
-      this.arrived = initial.head || Delta.getInitial('');
-      this.inFlight = Delta.getIdentity(this.arrived.endLength);
-      this.inLine = Delta.getIdentity(this.arrived.endLength);
+      this.arrived = initial.head || new Delta();
+      this.inFlight = new Delta().retain(this.arrived.length());
+      this.inLine = new Delta().retain(this.arrived.length());
       this.updateCallbacks = {
         inFlight: [],
         inLine: []
@@ -266,13 +266,13 @@
     TandemFile.prototype.remoteUpdate = function(delta, version) {
       var flightDeltaTranform, textTransform;
       this.version = version;
-      delta = Delta.makeDelta(delta);
+      delta = new Delta(delta);
       if (this.arrived.canCompose(delta)) {
         this.arrived = this.arrived.compose(delta);
-        flightDeltaTranform = delta.transform(this.inFlight, false);
-        textTransform = flightDeltaTranform.transform(this.inLine, false);
-        this.inFlight = this.inFlight.transform(delta, true);
-        this.inLine = this.inLine.transform(flightDeltaTranform, true);
+        this.inFlight = delta.transform(this.inFlight, true);
+        flightDeltaTranform = this.inFlight.transform(delta, false);
+        textTransform = this.inLine.transform(flightDeltaTranform, false);
+        this.inLine = flightDeltaTranform.transform(this.inLine, true);
         this.emit(TandemFile.events.UPDATE, textTransform);
         return true;
       } else {

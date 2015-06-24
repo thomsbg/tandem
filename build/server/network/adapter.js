@@ -1,9 +1,9 @@
 (function() {
-  var EventEmitter, Tandem, TandemNetworkAdapter, _makeResyncPacket, _onMessageError;
+  var Delta, EventEmitter, TandemNetworkAdapter, _makeResyncPacket, _onMessageError;
 
   EventEmitter = require('events').EventEmitter;
 
-  Tandem = require('tandem-core');
+  Delta = require('rich-text').Delta;
 
   _makeResyncPacket = function(file) {
     return {
@@ -51,9 +51,6 @@
             case TandemNetworkAdapter.routes.RESYNC:
               return resyncHandler(null, file, callback);
             case TandemNetworkAdapter.routes.SYNC:
-              if (err != null) {
-                return resyncHandler(err, file, callback);
-              }
               return file.sync(parseInt(packet.version), function(err, delta, version) {
                 return callback(err, {
                   delta: delta,
@@ -61,10 +58,7 @@
                 });
               });
             case TandemNetworkAdapter.routes.UPDATE:
-              if (err != null) {
-                return resyncHandler(err, file, callback);
-              }
-              return file.update(Tandem.Delta.makeDelta(packet.delta), parseInt(packet.version), function(err, delta, version) {
+              return file.update(new Delta(packet.delta), parseInt(packet.version), function(err, delta, version) {
                 if (err != null) {
                   return resyncHandler(err, file, callback);
                 } else {

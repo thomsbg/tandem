@@ -11,15 +11,14 @@
 # its contributors may be used to endorse or promote products derived from this
 # software without specific prior written permission.
 
-Tandem = require('tandem-core')
-
+Delta = require('rich-text').Delta
 
 class TandemStorage
   authorize: (authPacket, callback) ->
     callback(null)
 
   find: (fileId, callback) ->
-    callback(null, Tandem.Delta.getInitial(''), 0)
+    callback(null, new Delta(), 0)
 
   update: (fileId, head, version, deltas, callback) ->
     callback(null)

@@ -1,4 +1,5 @@
-Tandem         = require('tandem-core');
+Tandem         = {}
+Tandem.Delta   = require('rich-text').Delta;
 Tandem.Client  = require('./build/client/tandem');
 Tandem.File    = require('./build/client/file');
 Tandem.Network = {

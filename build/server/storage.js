@@ -1,7 +1,7 @@
 (function() {
-  var Tandem, TandemStorage;
+  var Delta, TandemStorage;
 
-  Tandem = require('tandem-core');
+  Delta = require('rich-text').Delta;
 
   TandemStorage = (function() {
     function TandemStorage() {}
@@ -11,7 +11,7 @@
     };
 
     TandemStorage.prototype.find = function(fileId, callback) {
-      return callback(null, Tandem.Delta.getInitial(''), 0);
+      return callback(null, new Delta(), 0);
     };
 
     TandemStorage.prototype.update = function(fileId, head, version, deltas, callback) {
